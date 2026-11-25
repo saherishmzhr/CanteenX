@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Student Registration', 'register', ~{::regBody})}">
+<th:block th:fragment="regBody">
+    <div class="auth-wrapper">
+        <div class="card">
+            <h1 class="page-title" style="font-size:1.45rem;">Student Registration</h1>
+            <p class="page-subtitle">Create a new student account to order meals.</p>
+
+            <form th:action="@{/register}" method="post" class="mt-2">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                <div class="form-group">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" th:value="${full_name}" class="form-control" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" th:value="${username}" class="form-control" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password (min 6 characters)</label>
+                    <input type="password" id="password" name="password" class="form-control" minlength="6" required/>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%;">Register Student</button>
+            </form>
+
+            <p class="mt-2 text-muted" style="font-size:0.88rem; text-align:center;">
+                Already registered? <a th:href="@{/login}">Back to Sign In</a>
+            </p>
+        </div>
+    </div>
+</th:block>
+</html>

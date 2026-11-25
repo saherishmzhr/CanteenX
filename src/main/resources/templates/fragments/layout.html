@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="page(title, activeNav, content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${title} + ' - ' + ${appName}">Smart Canteen</title>
+    <link rel="stylesheet" th:href="@{/css/canteen.css}"/>
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a class="brand" th:href="@{/}">
+            <span th:text="${appName}">Smart Canteen</span>
+            <span class="brand-badge">Live</span>
+        </a>
+
+        <button type="button" id="navToggle" class="nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+
+        <div id="navLinks" class="nav-links" sec:authorize="isAuthenticated()">
+            <!-- Student Links -->
+            <a th:href="@{/student/menu}"
+               th:classappend="${activeNav == 'menu'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('STUDENT')">Menu</a>
+
+            <a th:href="@{/student/cart}"
+               th:classappend="${activeNav == 'cart'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('STUDENT')">
+                Cart
+                <span th:if="${cartCount != null and cartCount > 0}"
+                      class="badge badge-veg"
+                      th:text="${cartCount}">0</span>
+            </a>
+
+            <a th:href="@{/student/orders}"
+               th:classappend="${activeNav == 'orders'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('STUDENT')">My Orders</a>
+
+            <!-- Staff Links -->
+            <a th:href="@{/staff/orders}"
+               th:classappend="${activeNav == 'staff-orders'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasAnyRole('STAFF','ADMIN')">Kitchen Orders</a>
+
+            <!-- Admin Links -->
+            <a th:href="@{/admin/dashboard}"
+               th:classappend="${activeNav == 'admin-dashboard'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('ADMIN')">Dashboard</a>
+
+            <a th:href="@{/admin/menu}"
+               th:classappend="${activeNav == 'admin-menu'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('ADMIN')">Menu CRUD</a>
+
+            <a th:href="@{/admin/reports}"
+               th:classappend="${activeNav == 'admin-reports'} ? 'active'"
+               class="nav-link"
+               sec:authorize="hasRole('ADMIN')">Sales &amp; Popular</a>
+        </div>
+
+        <div id="navUser" class="nav-user" sec:authorize="isAuthenticated()">
+            <span>
+                <strong th:text="${currentFullName}">User</strong>
+                <span class="role-pill" th:text="${currentRole}">ROLE</span>
+            </span>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+            </form>
+        </div>
+
+        <div class="nav-user" sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}" class="btn btn-secondary btn-sm">Login</a>
+            <a th:href="@{/register}" class="btn btn-primary btn-sm">Student Register</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div th:if="${successMessage != null}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage != null}" class="alert alert-error" th:text="${errorMessage}"></div>
+    <div th:if="${infoMessage != null}" class="alert alert-info" th:text="${infoMessage}"></div>
+
+    <div th:replace="${content}"></div>
+</main>
+
+<footer class="footer">
+    <span th:text="${appName} + ' Management System · Spring Boot 3 · Offline Ready'">Smart Canteen</span>
+</footer>
+
+<script th:src="@{/js/canteen.js}"></script>
+</body>
+</html>

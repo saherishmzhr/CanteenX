@@ -1,0 +1,44 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/gradle-wrapper.jar
+!**/src/test/**/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/nb-$nbproject-basedir/
+$TYRE/{}
+
+### VS Code ###
+.vscode/
+
+### H2 Local DB Files ###
+data/
+*.mv.db
+*.trace.db
+*.lock.db
+
+### OS / Logs ###
+*.log
+.DS_Store
+Thumbs.db

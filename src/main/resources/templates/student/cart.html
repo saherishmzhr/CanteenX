@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Your Cart', 'cart', ~{::cartBody})}">
+<th:block th:fragment="cartBody">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Your Order Cart</h1>
+            <p class="page-subtitle">Review items, adjust quantities, or proceed to checkout.</p>
+        </div>
+        <a th:href="@{/student/menu}" class="btn btn-secondary">Continue Browsing</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(cartItems)}" class="card" style="text-align:center; padding:2rem;">
+        <p class="text-muted">Your cart is currently empty.</p>
+        <a th:href="@{/student/menu}" class="btn btn-primary mt-1">Browse Menu</a>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(cartItems)}" class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th class="text-right">Unit Price</th>
+                    <th>Quantity</th>
+                    <th class="text-right">Subtotal</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ci : ${cartItems}">
+                    <td><strong th:text="${ci.item_name}">Item</strong></td>
+                    <td>
+                        <span th:class="${ci.category == 'VEG'} ? 'badge badge-veg' : 'badge badge-nonveg'"
+                              th:text="${ci.category}">VEG</span>
+                    </td>
+                    <td class="text-right"
+                        th:text="${currencySymbol} + ${#numbers.formatDecimal(ci.unit_price, 1, 2)}">₹0.00</td>
+                    <td>
+                        <form th:action="@{/student/cart/update}" method="post" class="flex-gap">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="itemId" th:value="${ci.item_id}"/>
+                            <input type="number" name="quantity" th:value="${ci.quantity}" min="0" max="99" class="qty-input"/>
+                            <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td class="text-right"><strong
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(ci.subtotal, 1, 2)}">₹0.00</strong></td>
+                    <td class="text-right">
+                        <form th:action="@{/student/cart/remove}" method="post" style="display:inline;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <input type="hidden" name="itemId" th:value="${ci.item_id}"/>
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-2" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+            <div>
+                <span class="text-muted">Total Items:</span>
+                <strong th:text="${cartCount}">0</strong>
+            </div>
+            <div class="flex-gap">
+                <span style="font-size:1.15rem; font-weight:700;">
+                    Total: <span th:text="${currencySymbol} + ${#numbers.formatDecimal(cartTotal, 1, 2)}">₹0.00</span>
+                </span>
+                <a th:href="@{/student/checkout}" class="btn btn-success">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Sales & Popular Reports', 'admin-reports', ~{::repBody})}">
+<th:block th:fragment="repBody">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Sales &amp; Popular Items Report</h1>
+            <p class="page-subtitle">Filter revenue, order counts, and top-selling items by date range.</p>
+        </div>
+    </div>
+
+    <form th:action="@{/admin/reports}" method="get" class="filter-bar">
+        <label for="startDate" class="form-label" style="margin:0;">From:</label>
+        <input type="date" id="startDate" name="startDate"
+               th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd') : ''}"
+               class="form-control input-inline"/>
+
+        <label for="endDate" class="form-label" style="margin:0;">To:</label>
+        <input type="date" id="endDate" name="endDate"
+               th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd') : ''}"
+               class="form-control input-inline"/>
+
+        <button type="submit" class="btn btn-primary btn-sm">Apply Range</button>
+        <a th:href="@{/admin/reports}" class="btn btn-secondary btn-sm">All Time</a>
+    </form>
+
+    <div class="grid-2 mb-1">
+        <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value"
+                 th:text="${currencySymbol} + ${#numbers.formatDecimal(totalRevenue, 1, 2)}">₹0.00</div>
+            <div class="stat-sub">Excludes cancelled orders</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Orders Count</div>
+            <div class="stat-value" th:text="${orderCount}">0</div>
+            <div class="stat-sub">Non-cancelled orders in range</div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-header">
+            <h2 class="card-title">Popular Items (By Quantity Sold)</h2>
+        </div>
+
+        <div th:if="${#lists.isEmpty(popularItems)}">
+            <p class="text-muted" style="margin:0;">No item sales in this date range.</p>
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(popularItems)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Item Name</th>
+                    <th class="text-right">Quantity Sold</th>
+                    <th class="text-right">Revenue Generated</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, st : ${popularItems}">
+                    <td th:text="${st.count}">1</td>
+                    <td><strong th:text="${item.item_name}">Dish</strong></td>
+                    <td class="text-right" th:text="${item.total_quantity}">0</td>
+                    <td class="text-right"
+                        th:text="${currencySymbol} + ${#numbers.formatDecimal(item.total_revenue, 1, 2)}">₹0.00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-header">
+            <h2 class="card-title">Orders Included in Report</h2>
+        </div>
+
+        <div th:if="${#lists.isEmpty(salesOrders)}">
+            <p class="text-muted" style="margin:0;">No orders match this range.</p>
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(salesOrders)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Token</th>
+                    <th>Date &amp; Time</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th class="text-right">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${salesOrders}">
+                    <td th:text="'#' + ${o.order_id}">#1</td>
+                    <td th:text="'#' + ${o.token_no}">#1</td>
+                    <td th:text="${#temporals.format(o.order_time, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                    <td th:text="${o.payment_method} + ' (' + ${o.payment_status} + ')'">UPI</td>
+                    <td>
+                        <span class="badge badge-status"
+                              th:classappend="'status-' + ${o.status}"
+                              th:text="${o.status}">PLACED</span>
+                    </td>
+                    <td class="text-right"><strong
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(o.total, 1, 2)}">₹0.00</strong></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

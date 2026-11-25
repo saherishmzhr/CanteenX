@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('My Orders', 'orders', ~{::ordersBody})}">
+<th:block th:fragment="ordersBody">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">My Order History</h1>
+            <p class="page-subtitle">Track live preparation status and tokens for your orders.</p>
+        </div>
+        <a th:href="@{/student/menu}" class="btn btn-primary">Order Food</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="card">
+        <p class="text-muted" style="margin:0;">You haven't placed any orders yet.</p>
+    </div>
+
+    <div class="card" th:if="${!#lists.isEmpty(orders)}">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Token</th>
+                    <th>Order ID</th>
+                    <th>Time</th>
+                    <th>Items</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th class="text-right">Total</th>
+                    <th class="text-right">Receipt</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="o : ${orders}">
+                    <td><strong style="font-size:1.05rem; color:var(--primary);" th:text="'#' + ${o.token_no}">#1</strong></td>
+                    <td th:text="'#' + ${o.order_id}">#1</td>
+                    <td th:text="${#temporals.format(o.order_time, 'dd MMM, hh:mm a')}">Time</td>
+                    <td>
+                        <div th:each="d : ${o.details}" style="font-size:0.85rem;"
+                             th:text="${d.quantity} + 'x ' + ${d.item_name}">1x Dosa</div>
+                    </td>
+                    <td>
+                        <span th:text="${o.payment_method}">UPI</span>
+                        <span class="badge"
+                              th:classappend="${o.payment_status == 'PAID'} ? 'badge-paid' : 'badge-pending'"
+                              th:text="${o.payment_status}">PAID</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-status"
+                              th:classappend="'status-' + ${o.status}"
+                              th:text="${o.status}">PLACED</span>
+                    </td>
+                    <td class="text-right"><strong
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(o.total, 1, 2)}">₹0.00</strong></td>
+                    <td class="text-right">
+                        <a th:href="@{/student/orders/{id}/confirmation(id=${o.order_id})}"
+                           class="btn btn-secondary btn-sm">Token Bill</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

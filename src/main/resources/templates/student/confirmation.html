@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Order Confirmation', 'orders', ~{::confBody})}">
+<th:block th:fragment="confBody">
+    <div style="max-width:680px; margin:0 auto;">
+        <div class="token-banner">
+            <div class="text-muted" style="font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">
+                Your Canteen Token Number
+            </div>
+            <div class="token-number" th:text="'#' + ${order.token_no}">#1</div>
+            <div>
+                <span class="badge badge-status"
+                      th:classappend="'status-' + ${order.status}"
+                      th:text="${order.status}">PLACED</span>
+                <span class="badge"
+                      th:classappend="${order.payment_status == 'PAID'} ? 'badge-paid' : 'badge-pending'"
+                      th:text="${order.payment_method} + ' · ' + ${order.payment_status}">UPI · PAID</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title" th:text="'Bill #' + ${order.order_id}">Bill</h2>
+                <span class="text-muted" th:text="${#temporals.format(order.order_time, 'dd MMM yyyy, hh:mm a')}">Time</span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${order.details}">
+                        <td th:text="${d.item_name}">Item</td>
+                        <td th:text="${d.quantity}">1</td>
+                        <td class="text-right"
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(d.unit_price, 1, 2)}">₹0.00</td>
+                        <td class="text-right"
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(d.subtotal, 1, 2)}">₹0.00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-2" style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:700; padding-top:0.85rem; border-top:1px solid var(--border);">
+                <span>Total Paid / Payable</span>
+                <span th:text="${currencySymbol} + ${#numbers.formatDecimal(order.total, 1, 2)}">₹0.00</span>
+            </div>
+
+            <div class="mt-2 flex-gap" style="justify-content:flex-end;">
+                <a th:href="@{/student/orders}" class="btn btn-secondary">My Order History</a>
+                <a th:href="@{/student/menu}" class="btn btn-primary">Order More</a>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

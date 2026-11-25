@@ -1,0 +1,43 @@
+CREATE DATABASE IF NOT EXISTS smart_canteen CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE smart_canteen;
+
+CREATE TABLE IF NOT EXISTS users (
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  full_name VARCHAR(100) NOT NULL,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS menu_items (
+  item_id INT AUTO_INCREMENT PRIMARY KEY,
+  item_name VARCHAR(100) NOT NULL,
+  category VARCHAR(10) NOT NULL,        -- VEG | NON-VEG
+  price DECIMAL(10,2) NOT NULL,
+  stock INT NOT NULL DEFAULT 0,
+  active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  token_no INT NOT NULL,
+  user_id INT NOT NULL,
+  order_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  total DECIMAL(10,2) NOT NULL,
+  payment_method VARCHAR(10) NOT NULL,  -- CASH | UPI
+  payment_status VARCHAR(10) NOT NULL DEFAULT 'PAID',   -- PENDING | PAID
+  status VARCHAR(15) NOT NULL DEFAULT 'PLACED',          -- PLACED|PREPARING|READY|COMPLETED|CANCELLED
+  CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS order_details (
+  detail_id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  item_id INT NOT NULL,
+  item_name VARCHAR(100) NOT NULL,
+  quantity INT NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL,
+  CONSTRAINT fk_details_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+  CONSTRAINT fk_details_item FOREIGN KEY (item_id) REFERENCES menu_items(item_id)
+);

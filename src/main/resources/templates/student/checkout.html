@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Checkout', 'cart', ~{::checkoutBody})}">
+<th:block th:fragment="checkoutBody">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Checkout</h1>
+            <p class="page-subtitle">Choose your payment method to generate your canteen token.</p>
+        </div>
+        <a th:href="@{/student/cart}" class="btn btn-secondary">Back to Cart</a>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Order Summary</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th class="text-right">Subtotal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="ci : ${cartItems}">
+                        <td th:text="${ci.item_name}">Dish</td>
+                        <td th:text="${ci.quantity}">1</td>
+                        <td class="text-right"
+                            th:text="${currencySymbol} + ${#numbers.formatDecimal(ci.subtotal, 1, 2)}">₹0.00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-2" style="display:flex; justify-content:space-between; font-size:1.15rem; font-weight:700; padding-top:0.75rem; border-top:1px solid var(--border);">
+                <span>Grand Total</span>
+                <span th:text="${currencySymbol} + ${#numbers.formatDecimal(cartTotal, 1, 2)}">₹0.00</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Payment Method</h2>
+            </div>
+
+            <form th:action="@{/student/checkout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                <div class="form-group">
+                    <label class="form-label">Select Payment Mode</label>
+                    <div style="display:flex; flex-direction:column; gap:0.65rem; margin-top:0.4rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer;">
+                            <input type="radio" name="paymentMethod" value="UPI" checked="checked"/>
+                            <span><strong>UPI</strong> — Instant digital token confirmation</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer;">
+                            <input type="radio" name="paymentMethod" value="CASH"/>
+                            <span><strong>CASH</strong> — Pay at counter (staff can confirm payment)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success" style="width:100%;">Place Order &amp; Get Token</button>
+            </form>
+        </div>
+    </div>
+</th:block>
+</html>

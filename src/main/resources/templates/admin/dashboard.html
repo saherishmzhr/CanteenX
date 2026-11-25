@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Admin Dashboard', 'admin-dashboard', ~{::dashBody})}">
+<th:block th:fragment="dashBody">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Admin Overview</h1>
+            <p class="page-subtitle">Canteen performance snapshot, menu catalog, and sales reporting.</p>
+        </div>
+        <div class="flex-gap">
+            <a th:href="@{/admin/menu}" class="btn btn-primary">Manage Menu</a>
+            <a th:href="@{/admin/reports}" class="btn btn-secondary">Detailed Reports</a>
+        </div>
+    </div>
+
+    <div class="grid-3 mb-1">
+        <div class="stat-card">
+            <div class="stat-label">Today's Revenue</div>
+            <div class="stat-value"
+                 th:text="${currencySymbol} + ${#numbers.formatDecimal(todayRevenue, 1, 2)}">₹0.00</div>
+            <div class="stat-sub" th:text="${todayOrders} + ' active/completed orders today'">0 orders</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">All-Time Revenue</div>
+            <div class="stat-value"
+                 th:text="${currencySymbol} + ${#numbers.formatDecimal(totalRevenue, 1, 2)}">₹0.00</div>
+            <div class="stat-sub" th:text="${totalOrders} + ' total non-cancelled orders'">0 orders</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Active Menu Items</div>
+            <div class="stat-value" th:text="${activeMenuCount} + ' / ' + ${totalMenuCount}">0 / 0</div>
+            <div class="stat-sub">Available for student ordering</div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-header">
+            <h2 class="card-title">Today's Popular Items</h2>
+            <a th:href="@{/admin/reports}" class="btn btn-secondary btn-sm">Full Report</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(popularItems)}">
+            <p class="text-muted" style="margin:0;">No item sales recorded today yet.</p>
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(popularItems)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Item Name</th>
+                    <th class="text-right">Quantity Sold</th>
+                    <th class="text-right">Revenue</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p, stat : ${popularItems}">
+                    <td th:text="${stat.count}">1</td>
+                    <td><strong th:text="${p.item_name}">Item</strong></td>
+                    <td class="text-right" th:text="${p.total_quantity}">0</td>
+                    <td class="text-right"
+                        th:text="${currencySymbol} + ${#numbers.formatDecimal(p.total_revenue, 1, 2)}">₹0.00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>
